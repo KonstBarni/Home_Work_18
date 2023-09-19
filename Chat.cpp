@@ -1,4 +1,6 @@
 #include <iostream>
+#include <fstream>
+#include <filesystem>
 #include <vector>
 #include <unordered_map>
 #include <iterator>
@@ -8,9 +10,29 @@
 #include "history_files/WorkWithFiles.h"
 
 using namespace std;
+namespace fs = filesystem;
 
 void Chat::start()			//маркер работы чата
 {
+	fstream read_user;
+    read_user.open("history_files/Users.txt", fstream::in | fstream::out);
+
+    if(!read_user)
+        cout<<"File not exist!" << endl;
+
+    read_user.seekg(0, ios_base::beg);
+
+    while(true)
+    {
+        if(read_user.eof())
+            break;
+        User us;
+        read_user >> us;
+		string pass = us.getUserPassword();
+		users_.push_back(us);
+		usersHash_.insert({us.getUserLogin(), hashFunction(pass)});
+    }
+    read_user.close();
 	isChatWork_ = true;
 }
 
@@ -107,7 +129,7 @@ void Chat::registration()				//функция регистрации
 	users_.push_back(user);							//кладет пользователя в вектор
 	currentUser_ = make_shared<User>(user);			//делает пользователя активным
 	usersHash_.insert({login, hashFunction(password)});				//добавляет в хеш таблицу
-	createUsers(user);
+	createUsers(user);								//создает файл истории пользователей
 }
 
 void Chat::showChat() const			//показать сообщения чата

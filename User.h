@@ -12,6 +12,7 @@ class User
 	bool admin_;
 
 public:
+	User();
 	User(const string& login, const string& password, const string& name, bool admin)
 		: login_(login), password_(password), name_(name), admin_(admin) {}
 
@@ -22,7 +23,7 @@ public:
 
 	void setUserPassword(const string& password) { password_ = password; }	//setters
 	void setUserName(const string& name) { name_ = name; }
-	friend std::fstream& operator >>(std::fstream& is, User& obj);
+	friend std::istream& operator >>(std::istream& is, User& obj);
 	friend std::ostream& operator <<(std::ostream& os, const User& obj);
 
 };

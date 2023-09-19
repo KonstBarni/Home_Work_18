@@ -2,5 +2,5 @@
 #include "../User.h"
 #include "../Massage.h"
 
-void createUsers(User& us);
-void createMessages(Message& mess);
+void createUsers(User& us);             //создание файла истории пользователей
+void createMessages(Message& mess);     //создание файла истории сообщений

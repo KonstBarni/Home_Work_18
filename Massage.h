@@ -32,4 +32,7 @@ public:
 	const string& getFrom() const { return _from; }
 	const string& getTo() const { return _to; }
 	const string& getText() const { return _text; }
+	friend std::fstream& operator >>(std::fstream& is, Message& obj);
+	friend std::ostream& operator <<(std::ostream& os, const Message& obj);
+
 };

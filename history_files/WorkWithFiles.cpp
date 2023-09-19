@@ -1,3 +1,4 @@
+#include <iostream>
 #include <fstream>
 #include <filesystem>
 #include "WorkWithFiles.h"
@@ -13,6 +14,6 @@ void createUsers(User& us)
     if(!file_writer)
         file_writer = fstream("history_files/Users.txt", ios::in | ios::out | ios::trunc);
 
-    file_writer << us;
+    file_writer << us << endl;
     file_writer.close();
 }

@@ -1,7 +1,12 @@
 #include <fstream>
 #include "User.h"
 
-std::fstream& operator >>(std::fstream& is, User& obj)
+User::User()
+{
+	login_ = ""; name_ = ""; password_ = ""; admin_ = false;
+}
+
+std::istream& operator >>(std::istream& is, User& obj)
 {
 	is >> obj.login_;
 	is >> obj.name_;
@@ -19,6 +24,5 @@ std::ostream& operator <<(std::ostream& os, const User& obj)
 	os << obj.password_;
 	os << ' ';
 	os << obj.admin_;
-	os << '\n';
 	return os;
 }

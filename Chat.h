@@ -9,12 +9,12 @@ using namespace std;
 
 struct UserLoginExp : public exception		//исключение ошибки логина
 {
-	const char* what() const noexcept override { return "error: user login is busy"; }
+	const char* what() const noexcept override { return "This user already exist!"; }
 };
 
 struct UserNameExp : public exception		//исключение ошибки имени юзера
 {
-	const char* what() const noexcept override { return "error: user name is busy"; }
+	const char* what() const noexcept override { return "This user already exist!"; }
 };
 
 class Chat
@@ -39,7 +39,8 @@ class Chat
 	shared_ptr<User> getUserByName(const string& name) const;		//возвращает пользователя по имени
 
 public:
-
+	//vector<User>& addUser(User user){users_.push_back(user); return users_;}
+	void addUserVtr(User& user){users_.push_back(user);}
 	bool isChatWork() const { return isChatWork_; }				//маркер работы чата
 	void start();												//старт чата
 	void showLoginMenu();										//меню логина/регистрации

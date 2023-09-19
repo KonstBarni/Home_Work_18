@@ -104,6 +104,8 @@ const string& inputMess(TrieNode* dict)
             inpMessWork = false;
         }
     }
+    getline(cin, inpWord);
+    message += inpWord;
     fullMessage += message;
     return fullMessage;
 }
