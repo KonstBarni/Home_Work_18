@@ -5,6 +5,9 @@
 #include <memory>
 #include "Massage.h"
 
+#define PATH_USER  "history_files/Users.txt"       //путь к файлу с пользователями
+#define PATH_MESS  "history_files/Messages.txt"       //путь к файлу с сообщениями
+
 using namespace std;
 
 struct UserLoginExp : public exception		//исключение ошибки логина
@@ -39,11 +42,13 @@ class Chat
 	shared_ptr<User> getUserByName(const string& name) const;		//возвращает пользователя по имени
 
 public:
-	//vector<User>& addUser(User user){users_.push_back(user); return users_;}
-	void addUserVtr(User& user){users_.push_back(user);}
+	
 	bool isChatWork() const { return isChatWork_; }				//маркер работы чата
 	void start();												//старт чата
 	void showLoginMenu();										//меню логина/регистрации
 	void showUserMenu();										//меню пользователя
 	shared_ptr<User> getCurrentUser() const { return currentUser_; }	//возвращает активного пользователя
+	void readUsersHistory();
+	void readMessagHistory();
+
 };

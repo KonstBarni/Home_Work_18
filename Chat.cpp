@@ -12,28 +12,16 @@
 using namespace std;
 namespace fs = filesystem;
 
-void Chat::start()			//маркер работы чата
+void Chat::start()			//запуск работы чата
 {
-	fstream read_user;
-    read_user.open("history_files/Users.txt", fstream::in | fstream::out);
+	//если файлы истории существуют, они будут считаны
+    if(fs::exists(PATH_USER))
+		readUsersHistory();
 
-    if(!read_user)
-        cout<<"File not exist!" << endl;
-
-    read_user.seekg(0, ios_base::beg);
-
-    while(true)
-    {
-        if(read_user.eof())
-            break;
-        User us;
-        read_user >> us;
-		string pass = us.getUserPassword();
-		users_.push_back(us);
-		usersHash_.insert({us.getUserLogin(), hashFunction(pass)});
-    }
-    read_user.close();
-	isChatWork_ = true;
+	if(fs::exists(PATH_MESS))
+		readMessagHistory();
+	
+	isChatWork_ = true;	
 }
 
 int Chat::hashFunction(string& password)   //хеш функция
@@ -254,18 +242,22 @@ void Chat::addMessage()			//добавить сообщение
 
 	cout << "To (name or all): " << endl;
 	cin >> to;
-	//cout << "Text: " << endl;
-	//cin.ignore();
-	//getline(cin, text);
 
-	text = fullMess();
+	text = fullMess();		//функция с автозаполнением
+
 	from = currentUser_->getUserName();
 
 	if (to == "all" || getUserByName(to))					//проверка правильности ввода кому
-		messages_.push_back(Message{from, to, text });
+	{	
+		Message m = Message(from, to, text);	
+		messages_.push_back(m);
+		createMessages(m);
+	}
 	else
+	{
 		cout << "error send message: cann't find " << to << endl;
 		return;
+	}
 }
 
  void Chat::dellMessage()				//удаление сообщения
@@ -285,9 +277,59 @@ void Chat::addMessage()			//добавить сообщение
 		}
 		messages_.erase(messages_.begin() + numMes-1);		//получаем итератор от начала, удаляем нужное сообщение
 		cout << "Message successfully deleted\n";
+		writeHistory(messages_);							//перезапись истории
 	}
 	catch (const exception& ex) 
 	{
 		cout << "error: " << ex.what() << endl;
 	}
+}
+
+void Chat::readUsersHistory()		//чтение итории пользователей из файла
+{
+	fstream read_user;
+    read_user.open(PATH_USER, fstream::in | fstream::out);
+
+	//если файл истории есть, он будет считан
+
+    if(!read_user)
+        cout<<"History Users file  not exist!" << endl;
+
+    read_user.seekg(0, ios_base::beg);
+
+    while(true)
+    {
+        if(read_user.eof())
+            break;
+        User us;
+        read_user >> us;
+		string pass = us.getUserPassword();
+		users_.push_back(us);
+		usersHash_.insert({us.getUserLogin(), hashFunction(pass)});
+    }
+	read_user.close();
+
+}
+
+void Chat::readMessagHistory()		//чтение истории сообщений из файла
+{
+	fstream read_mess;
+    read_mess.open(PATH_MESS, fstream::in | fstream::out);
+
+	//если файл истории есть, он будет считан
+
+    if(!read_mess)
+        cout<<"History Users file  not exist!" << endl;
+
+    read_mess.seekg(0, ios_base::beg);
+
+    while(true)
+    {
+        if(read_mess.eof())
+            break;
+        Message mess;
+        read_mess >> mess;
+		messages_.push_back(mess);
+    }
+	read_mess.close();
 }
