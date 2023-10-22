@@ -9,10 +9,6 @@
 
 using namespace std;
 
-// Client cl;
-// shared_ptr<Client> clptr = make_shared<Client>(cl); 
-
-
 void Chat::start()			//запуск работы чата
 {
 	isChatWork_ = true;	
@@ -81,16 +77,16 @@ void Chat::login()		//функция логина в чат
 
 void Chat::registration(shared_ptr<Client> clptr)				//функция регистрации
 {
-	string login, password, name, sendUser;
+	string login, name, password, sendUser;
 	bool admin;
 	char adminKey{};
 
 	cout << "login: ";
 	cin >> login;
-	cout << "password: ";
-	cin >> password;
 	cout << "name: ";
 	cin >> name;
+	cout << "password: ";
+	cin >> password;
 	cout << "Вы администратор?  [Y/N]  ";
 	cin >> adminKey;
 
@@ -107,11 +103,11 @@ void Chat::registration(shared_ptr<Client> clptr)				//функция регис
 		throw UserNameExp();
 	}
 
-	User user = User(login, password, name, admin);
+	User user = User(login, name, password, admin);
 	users_.push_back(user);							//кладет пользователя в вектор
 	currentUser_ = make_shared<User>(user);			//делает пользователя активным
 	usersHash_.insert({login, hashFunction(password)});				//добавляет в хеш таблицу
-	sendUser = "U%" + login + '#' + password + '#' + name + '#' + (admin? "true" : "false");
+	sendUser = "U#" + login + '#' + name + '#' + password + '#' + (admin? "true" : "false");
 	clptr->writeData(sendUser);
 }
 
@@ -150,9 +146,12 @@ void Chat::showLoginMenu() 			//меню логина/регистрации
 
 	char operation;
 
+	cout << "If are you wont stop a server: enter 's'" << endl;
+
 	do
 	{
-		cout << "(1)Registration" << endl << "(2)Login" << endl << "(q)Quit program" << endl;
+		cout << "(1)Registration" << endl << "(2)Login" << endl << "(q)Quit program" <<
+		endl << "(s)Stop server" << endl;
 		cin >> operation;
 
 		switch (operation)
@@ -171,6 +170,10 @@ void Chat::showLoginMenu() 			//меню логина/регистрации
 			login();
 			break;
 		case 'q':
+			isChatWork_ = false;
+			break;
+		case 's':
+			runServer_ = false;
 			isChatWork_ = false;
 			break;
 		default:
@@ -234,19 +237,19 @@ void Chat::showAllUsersName() const			//показать всех пользов
 void Chat::addMessage(shared_ptr<Client> clptr)			//добавить сообщение
 {
 	string from, to, text, messageSend;
+	
+	from = currentUser_->getUserName();
 
 	cout << "To (name or all): " << endl;
 	cin >> to;
 
 	text = fullMess();		//функция с автозаполнением
 
-	from = currentUser_->getUserName();
-
 	if (to == "all" || getUserByName(to))					//проверка правильности ввода кому
 	{	
 		Message m = Message(from, to, text);	
 		messages_.push_back(m);
-		messageSend = "M%" +from + '#' + to + '#' + text + '#';
+		messageSend = "M#" + from + '#' + to + '#' + text;
 		clptr->writeData(messageSend);
 	}
 	else
@@ -279,40 +282,3 @@ void Chat::addMessage(shared_ptr<Client> clptr)			//добавить сообщ�
 		cout << "error: " << ex.what() << endl;
 	}
 }
-
-vector<string> Chat::messageToVector(string& message, string delimiter)
-{
-    vector<string> resultVector;
-
-    if (!message.empty()) {
-        int start = 0;
-        do {
-            int idx = message.find(delimiter, start);
-            if (idx == string::npos) {
-                break;
-            }
-
-            int length = idx - start;
-            resultVector.push_back(message.substr(start, length));
-            start += (length + delimiter.size());
-        } while (true);
-
-        resultVector.push_back(message.substr(start));
-    }
-
-    return resultVector;
-}
-
-// string& userToSend(string& login, string& password, string& name, bool admin) //формирование пользователя для передчи по сети
-// {
-// 	string resMessage = "U%";	//идентификатор сообщения
-// 	resMessage += login + '#' + password + '#' + name + '#' + (admin? "true" : "false");
-// 	return resMessage;
-// }
-
-// string& messageToSend(string& from, string& to, string& text) //формирование сообщения для передчи по сети
-// {
-// 	string resMessage = "M%";	//идентификатор сообщения
-// 	resMessage += from + '#' + to + '#' + text + '#';
-// 	return resMessage;
-// }

@@ -18,10 +18,21 @@ int main()
 
     while (true) {
         clientMessage = server.readData();
+        if(clientMessage[0] == 'U'&& clientMessage[1]=='#')
+            chat.transformUser(clientMessage);
+        
+        if(clientMessage[0] == 'M'&& clientMessage[1]=='#')
+            chat.transformMess(clientMessage);
+
         if (clientMessage == "exit") {
-            break;
+            cout << "Client wos disconected!" << endl;
+            server.dataReceivingServer();
         }
-        serverMessage = chat.messageProcessing(clientMessage);
+
+        if(clientMessage == "stop")
+            break;
+
+        serverMessage = "Ok";
         server.writeData(serverMessage);
     }
 

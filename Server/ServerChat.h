@@ -32,5 +32,7 @@ public:
     void dataReceivingServer();
     char* readData();
     void writeData(string serverMessage);
+    void transformUser(string& mess);
+    void transformMess(char* mess);
     
 };

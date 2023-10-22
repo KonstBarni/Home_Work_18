@@ -14,6 +14,8 @@ public:
     void readUsersHistory();
 	void readMessagHistory();
     string messageProcessing(string& clientMessage);
+    void transformUser(string& message);
+    void transformMess(string& message);
 
     ~Chat();
 };

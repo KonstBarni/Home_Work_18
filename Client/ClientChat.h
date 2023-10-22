@@ -26,6 +26,5 @@ public:
     void closeSocket();
     char* readData();
     void writeData(string clientMessage);
-    pair<string, bool>& messGo(string& Mess, bool go);
 
 };

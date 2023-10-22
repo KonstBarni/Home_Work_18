@@ -1,4 +1,5 @@
 #include "Chat.h"
+#include "history_files/WorkWithFiles.h"
 
 void Chat::addUsers(User& us){users.push_back(us);}
 
@@ -51,29 +52,59 @@ void Chat::readMessagHistory()		//чтение истории сообщений
 	read_mess.close();
 }
 
-string Chat::messageProcessing(string& clientMessage)
+void Chat::transformUser(string& message)
 {
-    string outMessage;
+    string user, login, name, password;
+    bool admin;
+    user = message;
+    int pos = 0;
+    int delim = user.find("#");
+    pos = delim + 1;
+    delim = user.find('#', pos);
+    login = user.substr(pos, delim - pos );
+    pos = delim + 1;
+    delim = user.find('#', pos);
+    name = user.substr(pos, delim - pos );
+    pos = delim + 1;
+    delim = user.find('#', pos);
+    password = user.substr(pos, delim - pos );
+    pos = delim + 1;
 
-    //_vectorFromMessage = messageToVector(clientMessage, ":");
+    if(user[pos] == 't')
+        admin = true;
+        
+    User us(login, name, password, admin);
 
-    // if (_vectorFromMessage[0] == "loginUser") {
-    //     outMessage = loginUser();
-    // }
-    // else if (_vectorFromMessage[0] == "registerUser") {
-    //     outMessage = registerUser();
-    // }
-    // else if (_vectorFromMessage[0] == "showChat") {
-    //     outMessage = showChat();
-    // }
-    // else if (_vectorFromMessage[0] == "addMessage") {
-    //     outMessage = addMessage();
-    // }
-    // else if (_vectorFromMessage[0] == "showUsers") {
-    //     outMessage = showUsers();
-    // }
+    cout << login << " " << password << " " << name << " " << admin << endl;
 
-    return outMessage;
+    users.push_back(us);
+    createUsers(us);
+    cout<< us << endl;
+}
+
+void Chat::transformMess(string& message)
+{
+    string user, from, to, text;
+    bool admin;
+    user = message;
+    int pos = 0;
+    int delim = user.find("#");
+    pos = delim + 1;
+    delim = user.find('#', pos);
+    from = user.substr(pos, delim - pos );
+    pos = delim + 1;
+    delim = user.find('#', pos);
+    to = user.substr(pos, delim - pos );
+    pos = delim + 1;
+    delim = user.find('#', pos);
+    text = user.substr(pos);
+    pos = delim + 1;
+
+    Message mess(from, to, text);
+
+    messages.push_back(mess);
+    createMessages(mess);
+    cout << mess << endl;
 }
 
 Chat::~Chat(){}

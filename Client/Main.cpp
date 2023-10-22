@@ -4,12 +4,9 @@
 
 int main()
 {
-    std::string clientMessage, serverMessage, sendServ;
+    std::string clientMessage, serverMessage;
     Chat chat;
     Client client;
-    bool sendMess = false;
-    pair <string, bool> workMess;
-    shared_ptr<Client> cl = make_shared<Client> (client);
 
     chat.start();
     client.createSocket();
@@ -20,13 +17,21 @@ int main()
         chat.setSPTR(client);
         chat.showLoginMenu();
 
-        clientMessage = "Message to server";
-		//client.writeData(clientMessage);
-		if (clientMessage == "exit") {
+		if (!chat.isChatWork() && chat.isRunServ()) {
+            clientMessage ="exit";
+            client.writeData(clientMessage);
 			break;
 		}
+
+        if(!chat.isChatWork() && !chat.isRunServ())
+        {
+            clientMessage = "stop";
+            client.writeData(clientMessage);
+            break;
+        }
+
 		serverMessage = client.readData();
-		//chat.messageProcessing(serverMessage);
+        cout << serverMessage << endl;
 
         while (chat.getCurrentUser())
         {

@@ -79,3 +79,4 @@ void Server::writeData(string serverMessage)
         cout << "Data successfully sent to the client!" << message << endl;
     }
 }
+

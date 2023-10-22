@@ -7,14 +7,14 @@ using namespace std;
 class User
 {
 	string login_;
-	string password_;
 	string name_;
+	string password_;
 	bool admin_;
 
 public:
 	User();
-	User(const string& login, const string& password, const string& name, bool admin)
-		: login_(login), password_(password), name_(name), admin_(admin) {}
+	User(const string& login, const string& name, const string& password, bool admin)
+		: login_(login), name_(name), password_(password), admin_(admin) {}
 
 	const string& getUserLogin() const { return login_; }					//getters
 	const string& getUserPassword() const { return password_; }
