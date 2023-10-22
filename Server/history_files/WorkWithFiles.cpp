@@ -5,7 +5,7 @@
 #include "WorkWithFiles.h"
 #include "../User.h"
 #include "../Massage.h"
-#include "../Chat.h"
+//#include "../Chat.h"
 
 using namespace std;
 namespace fs = filesystem;

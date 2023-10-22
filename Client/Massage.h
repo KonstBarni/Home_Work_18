@@ -1,4 +1,6 @@
 #pragma once
+#include <string>
+#include <fstream>
 #include "User.h"
 
 using namespace std;
@@ -32,7 +34,8 @@ public:
 
 	const string& getFrom() const { return _from; }
 	const string& getTo() const { return _to; }
-	const string& getText() const { return _text; } 
+	const string& getText() const { return _text; }
+	const Message& getMessage(Message& mess) const { return mess;} 
 	friend std::fstream& operator >>(std::fstream& is, Message& obj);
 	friend std::ostream& operator <<(std::ostream& os, const Message& obj);
 };

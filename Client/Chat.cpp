@@ -1,26 +1,20 @@
 #include <iostream>
 #include <fstream>
 #include <filesystem>
-#include <vector>
-#include <unordered_map>
 #include <iterator>
 #include <algorithm>
 #include "Chat.h"
+#include "ClientChat.h"
 #include "autocomplite/Functions.h"
-#include "history_files/WorkWithFiles.h"
 
 using namespace std;
-namespace fs = filesystem;
+
+// Client cl;
+// shared_ptr<Client> clptr = make_shared<Client>(cl); 
+
 
 void Chat::start()			//запуск работы чата
 {
-	//если файлы истории существуют, они будут считаны
-    if(fs::exists(PATH_USER))
-		readUsersHistory();
-
-	if(fs::exists(PATH_MESS))
-		readMessagHistory();
-	
 	isChatWork_ = true;	
 }
 
@@ -85,9 +79,9 @@ void Chat::login()		//функция логина в чат
 	} while (!currentUser_);
 }
 
-void Chat::registration()				//функция регистрации
+void Chat::registration(shared_ptr<Client> clptr)				//функция регистрации
 {
-	string login, password, name;
+	string login, password, name, sendUser;
 	bool admin;
 	char adminKey{};
 
@@ -100,7 +94,7 @@ void Chat::registration()				//функция регистрации
 	cout << "Вы администратор?  [Y/N]  ";
 	cin >> adminKey;
 
-	if (adminKey == 'Y' || adminKey == 'y')			//проверка ввода админа
+	if (adminKey == 'Y' || adminKey == 'y' || adminKey == '1')	//проверка ввода админа
 		admin = true;
 
 	if (getUserByLogin(login) || login == "all")	//ловит исключение по логину
@@ -117,7 +111,8 @@ void Chat::registration()				//функция регистрации
 	users_.push_back(user);							//кладет пользователя в вектор
 	currentUser_ = make_shared<User>(user);			//делает пользователя активным
 	usersHash_.insert({login, hashFunction(password)});				//добавляет в хеш таблицу
-	createUsers(user);								//создает файл истории пользователей
+	sendUser = "U%" + login + '#' + password + '#' + name + '#' + (admin? "true" : "false");
+	clptr->writeData(sendUser);
 }
 
 void Chat::showChat() const			//показать сообщения чата
@@ -165,7 +160,7 @@ void Chat::showLoginMenu() 			//меню логина/регистрации
 		case '1':
 			try
 			{
-				registration();
+				registration(this->cltptr);
 			}
 			catch (const exception& e)
 			{
@@ -205,7 +200,7 @@ void Chat::showUserMenu()		//меню пользователя
 			showChat();
 			break;
 		case '2':
-			addMessage();
+			addMessage(this->cltptr);
 			break;
 		case '3':
 			showAllUsersName();
@@ -236,9 +231,9 @@ void Chat::showAllUsersName() const			//показать всех пользов
 	cout << endl;
 }
 
-void Chat::addMessage()			//добавить сообщение
+void Chat::addMessage(shared_ptr<Client> clptr)			//добавить сообщение
 {
-	string from, to, text;
+	string from, to, text, messageSend;
 
 	cout << "To (name or all): " << endl;
 	cin >> to;
@@ -251,7 +246,8 @@ void Chat::addMessage()			//добавить сообщение
 	{	
 		Message m = Message(from, to, text);	
 		messages_.push_back(m);
-		createMessages(m);
+		messageSend = "M%" +from + '#' + to + '#' + text + '#';
+		clptr->writeData(messageSend);
 	}
 	else
 	{
@@ -277,7 +273,6 @@ void Chat::addMessage()			//добавить сообщение
 		}
 		messages_.erase(messages_.begin() + numMes-1);		//получаем итератор от начала, удаляем нужное сообщение
 		cout << "Message successfully deleted\n";
-		writeHistory(messages_);							//перезапись истории
 	}
 	catch (const exception& ex) 
 	{
@@ -285,51 +280,39 @@ void Chat::addMessage()			//добавить сообщение
 	}
 }
 
-void Chat::readUsersHistory()		//чтение итории пользователей из файла
+vector<string> Chat::messageToVector(string& message, string delimiter)
 {
-	fstream read_user;
-    read_user.open(PATH_USER, fstream::in | fstream::out);
+    vector<string> resultVector;
 
-	//если файл истории есть, он будет считан
+    if (!message.empty()) {
+        int start = 0;
+        do {
+            int idx = message.find(delimiter, start);
+            if (idx == string::npos) {
+                break;
+            }
 
-    if(!read_user)
-        cout<<"History Users file  not exist!" << endl;
+            int length = idx - start;
+            resultVector.push_back(message.substr(start, length));
+            start += (length + delimiter.size());
+        } while (true);
 
-    read_user.seekg(0, ios_base::beg);
-
-    while(true)
-    {
-        if(read_user.eof())
-            break;
-        User us;
-        read_user >> us;
-		string pass = us.getUserPassword();
-		users_.push_back(us);
-		usersHash_.insert({us.getUserLogin(), hashFunction(pass)});
+        resultVector.push_back(message.substr(start));
     }
-	read_user.close();
 
+    return resultVector;
 }
 
-void Chat::readMessagHistory()		//чтение истории сообщений из файла
-{
-	fstream read_mess;
-    read_mess.open(PATH_MESS, fstream::in | fstream::out);
+// string& userToSend(string& login, string& password, string& name, bool admin) //формирование пользователя для передчи по сети
+// {
+// 	string resMessage = "U%";	//идентификатор сообщения
+// 	resMessage += login + '#' + password + '#' + name + '#' + (admin? "true" : "false");
+// 	return resMessage;
+// }
 
-	//если файл истории есть, он будет считан
-
-    if(!read_mess)
-        cout<<"History Users file  not exist!" << endl;
-
-    read_mess.seekg(0, ios_base::beg);
-
-    while(true)
-    {
-        if(read_mess.eof())
-            break;
-        Message mess;
-        read_mess >> mess;
-		messages_.push_back(mess);
-    }
-	read_mess.close();
-}
+// string& messageToSend(string& from, string& to, string& text) //формирование сообщения для передчи по сети
+// {
+// 	string resMessage = "M%";	//идентификатор сообщения
+// 	resMessage += from + '#' + to + '#' + text + '#';
+// 	return resMessage;
+// }
