@@ -75,11 +75,9 @@ void Chat::transformUser(string& message)
         
     User us(login, name, password, admin);
 
-    cout << login << " " << password << " " << name << " " << admin << endl;
-
     users.push_back(us);
     createUsers(us);
-    cout<< us << endl;
+    cout<< "User wos add: " << us << endl;
 }
 
 void Chat::transformMess(string& message)
@@ -104,7 +102,7 @@ void Chat::transformMess(string& message)
 
     messages.push_back(mess);
     createMessages(mess);
-    cout << mess << endl;
+    cout <<"Message wos add: " << mess << endl;
 }
 
 Chat::~Chat(){}

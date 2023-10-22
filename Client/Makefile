@@ -1,10 +1,10 @@
-TARGET = ConsoleChat
+TARGET = ClientChat
 PATHDICT = autocomplite/
 
 all: $(TARGET)
 
-$(TARGET):	Main.cpp User.o Massage.o Chat.o Dictionary.o Functions.o Trie.o
-	g++ -o $(TARGET) Main.cpp User.o Massage.o Chat.o Dictionary.o Functions.o Trie.o
+$(TARGET):	Main.cpp User.o Massage.o Chat.o Dictionary.o Functions.o Trie.o ClientChat.o
+	g++ -o $(TARGET) Main.cpp User.o Massage.o Chat.o Dictionary.o Functions.o Trie.o ClientChat.o
 
 Main.o:	Main.cpp
 	g++ -c Main.cpp
@@ -17,6 +17,9 @@ Massage.o:	Massage.cpp Massage.h
 
 Chat.o:	Chat.cpp Chat.h
 	g++ -c Chat.cpp
+
+ClientChat.o:	ClientChat.cpp ClientChat.h
+	g++ -c ClientChat.cpp
 
 Dictionary.o:	$(PATHDICT)Dictionary.cpp Dictionary.o
 	g++ -c $(PATHDICT)Dictionary.cpp
